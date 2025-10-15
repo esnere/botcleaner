@@ -185,67 +185,6 @@ namespace RobotCleaner
         }
     }
 
-    public class SpiralStrategy : IStrategy
-    {
-        public void Clean(Robot robot)
-        {
-            int[,] directions = new int[4, 2]
-            {
-                { 1, 0 }, 
-                { 0, 1 }, 
-                { -1, 0 }, 
-                { 0, -1 } 
-            };
-
-            int dirIndex = 0;
-            int segmentLength = 1;
-            int stepsTaken = 0;
-            int turns = 0; 
-
-            robot.CleanCurrentSpot();
-
-            while (true)
-            {
-                int nextX = robot.X + directions[dirIndex, 0];
-                int nextY = robot.Y + directions[dirIndex, 1];
-                int tryCount = 0;
-                while ((!robot.Map.IsInBounds(nextX, nextY) || robot.Map.IsObstacle(nextX, nextY)) && tryCount < 4)
-                {
-                    dirIndex = (dirIndex + 1) % 4;
-                    turns++;
-                    if (turns % 2 == 0)
-                        segmentLength++;
-                    stepsTaken = 0;
-                    nextX = robot.X + directions[dirIndex, 0];
-                    nextY = robot.Y + directions[dirIndex, 1];
-                    tryCount++;
-                }
-                if (tryCount == 4 && (!robot.Map.IsInBounds(nextX, nextY) || robot.Map.IsObstacle(nextX, nextY)))
-                    break;
-
-                
-                if (robot.Move(nextX, nextY))
-                {
-                    robot.CleanCurrentSpot();
-                    stepsTaken++;
-                }
-                else
-                {
-                    break;
-                }
-                
-                if (stepsTaken == segmentLength)
-                {
-                    dirIndex = (dirIndex + 1) % 4;
-                    turns++;
-                    stepsTaken = 0;
-                    if (turns % 2 == 0)
-                        segmentLength++;
-                }
-            }
-        }
-    }
-
     public class Program
     {
         public static void Main(string[] args)
