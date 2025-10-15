@@ -184,7 +184,83 @@ namespace RobotCleaner
             }
         }
     }
+    public class SpiralStrategy : IStrategy
+    {
+        public void Clean(Robot robot)
+        {
+            int startX = robot.Map.Width / 2;
+            int startY = robot.Map.Height / 2;
+            robot.Move(startX, startY);
 
+
+            int[,] directions = new int[,]
+            {
+            { 1, 0 },
+            { 0, 1 },
+            { -1, 0 },
+            { 0, -1 }
+            };
+
+            int dirIndex = 0; 
+            int segmentLength = 1;
+            int stepsTaken = 0;
+            int turns = 0;
+
+            bool canMove = true;
+
+            robot.CleanCurrentSpot();
+
+            while (canMove)
+            {
+                int newX = robot.X + directions[dirIndex, 0];
+                int newY = robot.Y + directions[dirIndex, 1];
+
+                if (robot.Move(newX, newY))
+                {
+                    robot.CleanCurrentSpot();
+                    stepsTaken++;
+                }
+                else
+                {
+                    bool stuck = true;
+                    for (int i = 0; i < 4; i++)
+                    {
+                        int testX = robot.X + directions[i, 0];
+                        int testY = robot.Y + directions[i, 1];
+                        if (robot.Map.IsInBounds(testX, testY) && !robot.Map.IsObstacle(testX, testY))
+                        {
+                            stuck = false;
+                            break;
+                        }
+                    }
+
+                    if (stuck)
+                        break; 
+                    else
+                    {
+                        dirIndex = (dirIndex + 1) % 4;
+                        stepsTaken = 0;
+                        turns++;
+                        if (turns % 2 == 0)
+                            segmentLength++;
+                        continue;
+                    }
+                }
+
+                if (stepsTaken >= segmentLength)
+                {
+                    dirIndex = (dirIndex + 1) % 4;
+                    stepsTaken = 0;
+                    turns++;
+
+                    if (turns % 2 == 0)
+                    {
+                        segmentLength++;
+                    }
+                }
+            }
+        }
+    }
     public class Program
     {
         public static void Main(string[] args)
