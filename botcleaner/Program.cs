@@ -189,19 +189,18 @@ namespace RobotCleaner
     {
         public void Clean(Robot robot)
         {
-            // Directions: Right, Down, Left, Up
             int[,] directions = new int[4, 2]
             {
-                { 1, 0 },   // Right
-                { 0, 1 },   // Down
-                { -1, 0 },  // Left
-                { 0, -1 }   // Up
+                { 1, 0 }, 
+                { 0, 1 }, 
+                { -1, 0 }, 
+                { 0, -1 } 
             };
 
-            int dirIndex = 0;         // Start moving right
-            int segmentLength = 1;    // Initial segment length
-            int stepsTaken = 0;       // Steps taken in current segment
-            int turns = 0;            // Number of direction changes
+            int dirIndex = 0;
+            int segmentLength = 1;
+            int stepsTaken = 0;
+            int turns = 0; 
 
             robot.CleanCurrentSpot();
 
@@ -209,8 +208,6 @@ namespace RobotCleaner
             {
                 int nextX = robot.X + directions[dirIndex, 0];
                 int nextY = robot.Y + directions[dirIndex, 1];
-
-                // If can't move, try the next direction (check all 4 directions)
                 int tryCount = 0;
                 while ((!robot.Map.IsInBounds(nextX, nextY) || robot.Map.IsObstacle(nextX, nextY)) && tryCount < 4)
                 {
@@ -223,12 +220,10 @@ namespace RobotCleaner
                     nextY = robot.Y + directions[dirIndex, 1];
                     tryCount++;
                 }
-
-                // If all directions are blocked, stop
                 if (tryCount == 4 && (!robot.Map.IsInBounds(nextX, nextY) || robot.Map.IsObstacle(nextX, nextY)))
                     break;
 
-                // Move and clean
+                
                 if (robot.Move(nextX, nextY))
                 {
                     robot.CleanCurrentSpot();
@@ -236,11 +231,9 @@ namespace RobotCleaner
                 }
                 else
                 {
-                    // If move failed, break (should not happen due to above check)
                     break;
                 }
-
-                // If finished this segment, turn and possibly increase segment length
+                
                 if (stepsTaken == segmentLength)
                 {
                     dirIndex = (dirIndex + 1) % 4;
